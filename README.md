@@ -1,4 +1,5 @@
 # AQI India — Analyzer & Health Impact
+🔗Railway Deployment link: https://web-production-5ce9f.up.railway.app/
 
 Portfolio-ready air quality dashboard with Flask API, ML forecasts (Random Forest / XGBoost), health impact guidance, and cloud deployment (Render + GitHub Pages).
 
