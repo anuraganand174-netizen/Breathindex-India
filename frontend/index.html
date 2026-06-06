@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BreathIndex India — Live AQI Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">◎</span>
+      <div>
+        <h1>BreathIndex <span>India</span></h1>
+        <p>Real-time air quality · Health impact · AI forecasts</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div id="live-clock" class="live-clock">—</div>
+      <button type="button" id="refresh-btn" class="btn-ghost" title="Refresh live data">↻ Live sync</button>
+      <span id="api-status" class="pill">Connecting…</span>
+    </div>
+  </header>
+
+  <section class="hero-stats" id="hero-stats">
+    <article class="stat-card">
+      <span class="stat-label">National average</span>
+      <strong id="stat-avg">—</strong>
+      <span id="stat-avg-cat" class="stat-sub">—</span>
+    </article>
+    <article class="stat-card accent-warn">
+      <span class="stat-label">Most polluted now</span>
+      <strong id="stat-worst">—</strong>
+      <span id="stat-worst-sub" class="stat-sub">—</span>
+    </article>
+    <article class="stat-card accent-good">
+      <span class="stat-label">Cleanest now</span>
+      <strong id="stat-best">—</strong>
+      <span id="stat-best-sub" class="stat-sub">—</span>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Cities reporting</span>
+      <strong id="stat-count">—</strong>
+      <span class="stat-sub">Open-Meteo live model</span>
+    </article>
+  </section>
+
+  <main class="layout">
+    <section class="panel map-panel">
+      <div class="panel-head">
+        <h2>India live AQI map</h2>
+        <p id="map-updated">Loading real-time readings…</p>
+      </div>
+      <div id="india-map" class="map-container"></div>
+      <div class="legend" id="aqi-legend">
+        <span><i style="background:#22c55e"></i> Good (0–50)</span>
+        <span><i style="background:#84cc16"></i> Satisfactory</span>
+        <span><i style="background:#eab308"></i> Moderate</span>
+        <span><i style="background:#f97316"></i> Poor</span>
+        <span><i style="background:#ef4444"></i> Very Poor</span>
+        <span><i style="background:#991b1b"></i> Severe</span>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <section class="panel gauge-panel">
+        <div class="panel-head compact">
+          <h2>Selected city</h2>
+          <span id="data-source" class="tag">LIVE</span>
+        </div>
+        <div class="gauge-wrap">
+          <svg class="gauge-ring" viewBox="0 0 200 200">
+            <circle class="gauge-bg" cx="100" cy="100" r="88" />
+            <circle id="gauge-progress" class="gauge-fill" cx="100" cy="100" r="88" />
+          </svg>
+          <div class="gauge-center">
+            <span id="aqi-value" class="aqi-num">—</span>
+            <span id="aqi-category" class="aqi-cat">—</span>
+          </div>
+        </div>
+        <p id="aqi-meta" class="city-meta">Select a city on the map</p>
+        <div class="controls-row">
+          <label for="state-select">State</label>
+          <select id="state-select"></select>
+          <label for="city-select">City</label>
+          <select id="city-select"></select>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head compact"><h2>Pollutants</h2></div>
+        <div id="pollutant-bars" class="pollutant-bars"></div>
+      </section>
+
+      <section class="panel health-panel">
+        <div class="panel-head compact"><h2>Health impact</h2></div>
+        <p id="health-category" class="health-title">—</p>
+        <p id="health-effect" class="health-text"></p>
+        <p id="health-precautions" class="health-tip"></p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head compact">
+          <h2>AI forecast</h2>
+          <button type="button" id="predict-btn" class="btn-primary">Run prediction</button>
+        </div>
+        <div class="predict-controls">
+          <select id="model-select">
+            <option value="random_forest">Random Forest</option>
+            <option value="xgboost">XGBoost</option>
+          </select>
+          <select id="horizon-select">
+            <option value="1">+1 day</option>
+            <option value="7" selected>+7 days</option>
+            <option value="30">+30 days</option>
+          </select>
+        </div>
+        <p id="predict-result" class="predict-result"></p>
+      </section>
+    </aside>
+
+    <section class="panel chart-panel wide">
+      <div class="panel-head">
+        <h2>AQI trend</h2>
+        <label class="range-label">
+          History
+          <input type="range" id="days-range" min="7" max="90" value="30" />
+          <span id="days-label">30d</span>
+        </label>
+      </div>
+      <canvas id="aqi-chart"></canvas>
+    </section>
+
+    <section class="panel ranking-panel wide">
+      <div class="panel-head"><h2>Live city rankings</h2></div>
+      <div id="city-rankings" class="rankings-grid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Data: <a href="https://open-meteo.com/en/docs/air-quality-api" target="_blank" rel="noopener">Open-Meteo Air Quality</a> (refreshed every 10 min) · Indian NAQI bands · ML on historical readings</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
