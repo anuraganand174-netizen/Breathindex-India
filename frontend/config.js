@@ -4,7 +4,7 @@
  * - GitHub Pages: set PRODUCTION_API to your Render/Railway HTTPS URL (no trailing slash)
  */
 (function () {
-  var PRODUCTION_API = "https://YOUR-SERVICE.onrender.com";
+  var PRODUCTION_API = "https://web-production-5ce9f.up.railway.app";
 
   var isLocal =
     typeof window !== "undefined" &&
